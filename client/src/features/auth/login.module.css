@@ -1,0 +1,85 @@
+.overlay {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: linear-gradient(180deg, #eef1f5 0%, #f8fafc 100%);
+}
+
+.dialog {
+  width: 100%;
+  max-width: 380px;
+  padding: 28px;
+  background: #fff;
+  border: 1px solid #dbe1e8;
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(16, 24, 40, 0.12);
+}
+
+.title {
+  margin: 0 0 4px;
+  font-size: 20px;
+}
+
+.subtitle {
+  margin: 0 0 20px;
+  color: #5b6472;
+  font-size: 14px;
+}
+
+.field {
+  display: block;
+  margin-bottom: 16px;
+}
+
+.label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.input {
+  width: 100%;
+  padding: 9px 11px;
+  border: 1px solid #c3ccd6;
+  border-radius: 6px;
+  font: inherit;
+}
+
+.input:focus {
+  outline: 2px solid #e16318;
+  outline-offset: 0;
+  border-color: transparent;
+}
+
+.submit {
+  width: 100%;
+  padding: 10px;
+  font: inherit;
+  font-weight: 600;
+  color: #fff;
+  background: #e16318;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.submit:hover:not(:disabled) {
+  background: color-mix(in srgb, #e16318 85%, #000);
+}
+
+.submit:disabled {
+  background: #cdd3da;
+  cursor: not-allowed;
+}
+
+.message {
+  margin: 14px 0 0;
+  font-size: 13px;
+}
+
+.error {
+  color: #d93025;
+}

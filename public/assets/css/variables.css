@@ -1,0 +1,45 @@
+:root {
+  --color-bg: #f3f5f8;
+  --color-surface: #ffffff;
+  --color-surface-alt: #f8fafc;
+  --color-text: #131722;
+  --color-text-muted: #5b6472;
+  --color-border: #dbe1e8;
+  --color-border-strong: #c3ccd6;
+  --color-primary: #e16318;
+  --color-primary-dark: color-mix(in srgb, var(--color-primary) 85%, #000);
+  --color-primary-soft: color-mix(in srgb, var(--color-primary) 12%, #fff);
+  --color-primary-border: color-mix(in srgb, var(--color-primary) 38%, #fff);
+  --color-danger: #d93025;
+  --color-danger-soft: #fdecea;
+  --color-danger-dark: color-mix(in srgb, var(--color-danger) 85%, #000);
+  --color-warning: #b06000;
+  --color-warning-soft: #fff4e0;
+  --color-warning-dark: color-mix(in srgb, var(--color-warning) 85%, #000);
+  --color-success: #188038;
+
+  --color-border-hover: #9aabba;
+  --color-disabled-bg: #cdd3da;
+  --color-disabled-text: #7c8590;
+  --color-backdrop: #e8edf3;
+  --color-overlay: color-mix(in srgb, var(--color-text) 55%, transparent);
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+
+  --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.06);
+  --shadow-md: 0 8px 24px rgba(16, 24, 40, 0.12);
+
+  --content-width: 920px;
+}

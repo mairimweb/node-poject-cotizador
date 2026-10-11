@@ -1,0 +1,286 @@
+/* ---------- Hoja A4 en pantalla y en impresión ---------- */
+
+.print-sheet {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-text);
+}
+
+.print-sheet h1 {
+  font-size: 22px;
+  letter-spacing: -0.01em;
+}
+
+.print-sheet h2 {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+  margin-bottom: 4px;
+}
+
+.print-sheet p {
+  margin: 0 0 3px;
+}
+
+.print-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  padding-bottom: 12mm;
+  border-bottom: 3px solid var(--color-text);
+}
+
+.print-header p {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.ph-web a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.ph-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ph-text {
+  min-width: 0;
+}
+
+.ph-brand h1 {
+  margin-bottom: 4px;
+}
+
+.ph-doc {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.ph-doc-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+}
+
+.ph-doc-number {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 2px 0 6px;
+}
+
+.print-client {
+  padding: 8mm 0 4mm;
+}
+
+.print-client p {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.print-items {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 2mm;
+  table-layout: fixed;
+}
+
+.print-items th {
+  text-align: left;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+  padding: 5px 8px;
+  border-bottom: 1px solid var(--color-text);
+}
+
+.print-items th:nth-child(1) {
+  width: 8mm;
+}
+
+.print-items th:nth-child(3) {
+  width: 16mm;
+}
+
+.print-items th:nth-child(4) {
+  width: 34mm;
+}
+
+.print-items th:nth-child(5) {
+  width: 36mm;
+}
+
+.print-items td {
+  padding: 7px 8px;
+  font-size: 13px;
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: top;
+}
+
+.print-items td:last-child,
+.print-items td:nth-child(3),
+.print-items td:nth-child(4),
+.print-items .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.print-totals {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-top: 6mm;
+  padding-left: 40mm;
+}
+
+.pt-line {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  width: 100%;
+  padding: 2px 0;
+  font-size: 13px;
+}
+
+.pt-line strong {
+  font-variant-numeric: tabular-nums;
+}
+
+.pt-total {
+  margin-top: 3mm;
+  padding-top: 4px;
+  border-top: 2px solid var(--color-text);
+  font-size: 16px;
+}
+
+.pt-total strong {
+  font-size: 17px;
+}
+
+.print-notes {
+  margin-top: 8mm;
+  width: 100%;
+  max-width: 100%;
+  overflow-wrap: break-word;
+}
+
+.print-notes p {
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  font-size: 13px;
+}
+
+.print-footer {
+  margin-top: 12mm;
+  padding-top: 4mm;
+  border-top: 1px solid var(--color-border);
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.pf-contacts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 4mm 24px;
+  margin-bottom: 4mm;
+}
+
+.pf-contact {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.pf-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+}
+
+.pf-value {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.pf-highlight {
+  background: var(--color-primary-soft);
+  border: 1px solid var(--color-primary-border);
+  border-left: 4px solid var(--color-primary);
+  border-radius: 6px;
+  padding: 6px 10px;
+  margin-bottom: 4mm;
+}
+
+.pf-highlight-title {
+  font-weight: 700;
+  color: var(--color-primary-dark);
+  margin-bottom: 2px;
+}
+
+.pf-highlight-text {
+  font-size: 11px;
+  color: var(--color-text);
+  white-space: pre-line;
+}
+
+.pf-rights {
+  margin: 0;
+}
+
+/* ---------- Impresión ---------- */
+
+@media print {
+  @page {
+    size: A4;
+    margin: 12mm;
+  }
+
+  html,
+  body {
+    background: var(--color-surface);
+  }
+
+  .print-sheet {
+    width: auto;
+    max-width: none;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .print-sheet h1,
+  .print-client,
+  .print-notes,
+  .print-footer {
+    break-inside: avoid;
+  }
+
+  .print-items tr {
+    break-inside: avoid;
+  }
+
+  .print-header {
+    padding-bottom: 8mm;
+  }
+
+  .print-client {
+    padding-top: 6mm;
+  }
+}

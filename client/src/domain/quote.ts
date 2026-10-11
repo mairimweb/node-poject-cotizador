@@ -1,0 +1,188 @@
+import { CONFIG } from './config';
+import type {
+  CalculatedItem,
+  ItemNumber,
+  Quote,
+  QuoteCalculation,
+  QuoteErrors,
+  QuoteItem,
+  QuoteItemInput
+} from './types';
+
+export const round2 = (n: number | string): number =>
+  Math.round((Number(n) + Number.EPSILON) * 100) / 100;
+
+const pad2 = (n: number): string => String(n).padStart(2, '0');
+
+export function toISODate(date: Date): string {
+  return `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`;
+}
+
+export function makeValidUntil(
+  date: Date = new Date(),
+  days: number = CONFIG.VALIDITY_DAYS_DEFAULT
+): string {
+  const d = new Date(date);
+  d.setDate(d.getDate() + days);
+  return toISODate(d);
+}
+
+const SLUG_MAX_LENGTH = 32;
+
+export function sanitizeClientSlug(client: unknown): string {
+  return String(client ?? '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^A-Za-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '')
+    .slice(0, SLUG_MAX_LENGTH);
+}
+
+export function makeQuoteNumber(client: unknown, date: Date = new Date()): string {
+  const p = (n: number) => pad2(n);
+  const slug = sanitizeClientSlug(client) || 'CLIENTE';
+  return `${slug}_${date.getFullYear()}${p(date.getMonth() + 1)}${p(date.getDate())}-${p(date.getHours())}${p(date.getMinutes())}${p(date.getSeconds())}`;
+}
+
+export function makeInvoiceNumber(counter: number, client: unknown): string {
+  const slug = sanitizeClientSlug(client) || 'CLIENTE';
+  return CONFIG.NUMBERING.SLUG_ACTIVE ? `${counter}_${slug}` : String(counter);
+}
+
+export function resolveNumberCollision(base: string, existingNumbers: readonly string[] = []): string {
+  if (!existingNumbers.includes(base)) return base;
+  for (const suffix of 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') {
+    const candidate = `${base}_${suffix}`;
+    if (!existingNumbers.includes(candidate)) return candidate;
+  }
+  return `${base}_${Date.now()}`;
+}
+
+const normNumber = (value: unknown): ItemNumber =>
+  value === '' || value === null || value === undefined ? '' : Number(value);
+
+const normItem = (item?: QuoteItemInput | null): QuoteItem => ({
+  description: String(item?.description ?? ''),
+  quantity: normNumber(item?.quantity),
+  price: normNumber(item?.price)
+});
+
+export interface CreateQuoteInput {
+  client?: unknown;
+  currency?: string;
+  discount?: number | string;
+  items?: ReadonlyArray<QuoteItemInput | null | undefined>;
+  notes?: unknown;
+  number?: string | null;
+  date?: Date;
+  validUntil?: string | null;
+}
+
+export function createQuote({
+  client = '',
+  currency = CONFIG.DEFAULT_CURRENCY,
+  discount = 0,
+  items = [],
+  notes = '',
+  number = null,
+  date = new Date(),
+  validUntil = null
+}: CreateQuoteInput = {}): Quote {
+  return {
+    number,
+    date: date.toISOString(),
+    validUntil: validUntil || toISODate(date),
+    client: String(client),
+    currency,
+    discount: Number(discount) || 0,
+    items: items.map(normItem),
+    notes: String(notes),
+    status: 'generado'
+  };
+}
+
+export const lineTotal = (item: QuoteItemInput): number =>
+  round2((Number(item.quantity) || 0) * (Number(item.price) || 0));
+
+export interface CalculateQuoteInput {
+  currency?: string;
+  discount?: number | string;
+  items?: ReadonlyArray<QuoteItemInput>;
+}
+
+export function calculateQuote(quote: CalculateQuoteInput): QuoteCalculation {
+  const currency =
+    CONFIG.CURRENCIES.find((c) => c.code === quote.currency) ?? CONFIG.CURRENCIES[0];
+  const items: CalculatedItem[] = (quote.items ?? []).map((item) => ({
+    description: String(item.description ?? ''),
+    quantity: item.quantity ?? '',
+    price: item.price ?? '',
+    subtotal: lineTotal(item)
+  }));
+  const subtotal = round2(items.reduce((sum, item) => sum + item.subtotal, 0));
+  const discount = Math.min(Math.max(Number(quote.discount) || 0, 0), 100);
+  const discountAmount = round2(subtotal * (discount / 100));
+  const base = round2(subtotal - discountAmount);
+  const taxRate = currency.tax;
+  const tax = taxRate ? round2(base * taxRate) : 0;
+  const total = round2(base + tax);
+  return { items, subtotal, discount, discountAmount, base, tax, taxRate, total, currency };
+}
+
+export interface ValidateQuoteInput {
+  client?: unknown;
+  items?: unknown;
+  discount?: number | string;
+  validUntil?: string | null;
+}
+
+export function validateQuote(quote: ValidateQuoteInput): QuoteErrors {
+  const errors: QuoteErrors = {};
+  if (!String(quote.client ?? '').trim()) errors.client = 'Ingresá el nombre del cliente.';
+
+  const items: Partial<QuoteItem>[] = Array.isArray(quote.items) ? quote.items : [];
+  if (!items.length) {
+    errors.items = 'Agregá al menos un item.';
+  } else {
+    items.forEach((item, index) => {
+      if (!String(item.description ?? '').trim())
+        errors[`item-${index}-description`] = 'Agregá una descripción.';
+      const quantity = item.quantity;
+      const price = item.price;
+      if (quantity === '' || quantity === null || quantity === undefined) {
+        errors[`item-${index}-quantity`] = 'Ingresá una cantidad.';
+      } else if (!(Number(quantity) > 0)) {
+        errors[`item-${index}-quantity`] = 'La cantidad debe ser mayor a 0.';
+      }
+      if (price === '' || price === null || price === undefined) {
+        errors[`item-${index}-price`] = 'Ingresá el precio.';
+      } else if (!(Number(price) >= 0)) {
+        errors[`item-${index}-price`] = 'El precio no puede ser negativo.';
+      }
+    });
+  }
+
+  const discount = Number(quote.discount);
+  if (!Number.isFinite(discount) || discount < 0 || discount > 100) {
+    errors.discount = 'El descuento debe estar entre 0 y 100.';
+  }
+
+  const validUntil = quote.validUntil;
+  if (!validUntil || !/^\d{4}-\d{2}-\d{2}$/.test(String(validUntil))) {
+    errors.validUntil = 'Elegí una fecha de validez.';
+  } else if (String(validUntil) <= toISODate(new Date())) {
+    errors.validUntil = 'La fecha de validez debe ser posterior a hoy.';
+  }
+
+  return errors;
+}
+
+export function isItemComplete(item?: QuoteItemInput | null): boolean {
+  if (!item || !String(item.description ?? '').trim()) return false;
+  const quantity = item.quantity;
+  const price = item.price;
+  if (quantity === '' || quantity === null || quantity === undefined || !(Number(quantity) > 0))
+    return false;
+  if (price === '' || price === null || price === undefined || !(Number(price) >= 0)) return false;
+  return true;
+}
